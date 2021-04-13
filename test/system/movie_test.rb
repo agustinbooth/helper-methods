@@ -1,64 +1,55 @@
 require "application_system_test_case"
 
 class MoviesTest < ApplicationSystemTestCase
-
   test "visiting the index" do
     visit movies_url
-  
     assert_selector "h1", text: "List of all movies"
   end
 
-  test "creating a movie" do
+  test "creating a Movie" do
+    original_movie_count = Movie.count
+
     visit movies_url
-
-    first_movie_count = Movie.count
-
     click_on "Add a new movie"
 
-    fill_in "Title", with: "Creating a Movie"
-    fill_in "Description", with: "Created this movie successfully!"
-
+    fill_in "Description", with: "A new movie's descroption"
+    fill_in "Title", with: "A new movie's title"
     click_on "Create movie"
 
     assert_text "Movie created successfully"
-    assert_equal((first_movie_count + 1), Movie.count)
+    
+    ending_movie_count = Movie.count
+    assert_equal original_movie_count + 1, ending_movie_count
   end
 
-  test "visiting show movie" do
+  test "updating a Movie" do
     @movie = movies(:one)
-    visit "movies/#{@movie.id}"
-    assert_selector "h1", text: "Movie ##{@movie.id} details"
+
+    visit "/movies/#{@movie.id}/edit"
+
+    fill_in "Description", with: "Some other description"
+    fill_in "Title", with: "Some other title"
+
+    click_on "Update movie"
+    
+    assert_text "Movie updated successfully"
+
+    @movie.reload # Why do we need this?
+    assert_equal "Some other title", @movie.title
+    assert_equal "Some other description", @movie.description
   end
 
-  test "deleting a movie" do
-
-    first_movie_count = Movie.count
-
+  test "destroying a Movie" do
     @movie = movies(:one)
-    visit "movies/#{@movie.id}"
+    original_movie_count = Movie.count
 
+    visit movies_url
+    click_on "Show details", match: :first
     click_on "Delete movie"
 
     assert_text "Movie deleted successfully"
-    assert_equal((first_movie_count - 1), Movie.count)
+    
+    ending_movie_count = Movie.count
+    assert_equal original_movie_count - 1, ending_movie_count
   end
-
-  test "edit a movie" do
-
-    @movie = movies(:one)
-    visit "movies/#{@movie.id}"
-
-    click_on "Edit movie"
-
-    fill_in "Title", with: "Editing a Movie"
-    fill_in "Description", with: "Edited this movie successfully!"
-
-    click_on "Update movie"
-
-    assert_text "Movie updated successfully"
-    assert_text "Editing a Movie"
-    assert_text "Edited this movie successfully!"
-  end
-
-
 end
