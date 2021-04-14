@@ -39,10 +39,12 @@ class DirectorsController < ApplicationController
   end
 
   def update
+
     director = Director.find(params.fetch(:id))
 
-    director.name = params.fetch(:director).fetch(:name)
-    director.dob = params.fetch(:director).fetch(:dob)
+    director_attributes = params.fetch(:director).permit(:name, :dob)
+
+    director.update(director_attributes)    
 
     if director.valid?
       director.save
